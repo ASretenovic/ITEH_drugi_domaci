@@ -3,6 +3,9 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+use Faker\Generator as Faker;
+use App\Models\Category;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Book>
@@ -17,7 +20,13 @@ class BookFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'title' => fake()->word(),
+            'author'=> fake()->name(),
+            'quote' => fake()->sentence(),
+            'pages' => fake()->numberBetween(20,2000),
+            'category_id' => function(){
+                return Category::all()->random();
+            }
         ];
     }
 }
