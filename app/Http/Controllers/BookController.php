@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
+use App\Http\Resources\Book\BookResource;
+use App\Http\Resources\Book\BookCollection;
 
 class BookController extends Controller
 {
@@ -15,7 +17,7 @@ class BookController extends Controller
      */
     public function index()
     {
-        //
+        return BookCollection::collection(Book::paginate(4));                   // sve knjige iz baze, ali po 4 se prikazuju na jednoj stanici
     }
 
     /**
@@ -47,7 +49,8 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        //
+        //return $book;                    // vraca sve podatke iz baze o datoj knjizi
+        return new BookResource($book);    // vraca samo podatke definisane u BookResource
     }
 
     /**
