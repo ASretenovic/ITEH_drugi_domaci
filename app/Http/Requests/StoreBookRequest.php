@@ -13,7 +13,8 @@ class StoreBookRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        // default vrednost je false
+        return true;
     }
 
     /**
@@ -23,8 +24,12 @@ class StoreBookRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
-        ];
+            return [
+                'title' => 'required|unique:books',
+                'author' => 'required',
+                'excerpt' => 'required',
+                'number_of_pages' => 'required',
+                'category' => 'required'
+            ];
     }
 }

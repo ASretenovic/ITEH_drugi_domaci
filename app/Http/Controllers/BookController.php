@@ -7,9 +7,18 @@ use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Http\Resources\Book\BookResource;
 use App\Http\Resources\Book\BookCollection;
+use Symfony\Component\HttpFoundation\Response;
 
 class BookController extends Controller
 {
+
+
+    public function __construct()
+    {
+        // autentifikacija neophodna, osim za prikaz knjiga
+        $this->middleware('auth:api')->except('index','show');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -38,7 +47,18 @@ class BookController extends Controller
      */
     public function store(StoreBookRequest $request)
     {
-        //
+        $book = new Book;
+        $book->title = $request->title;
+        $book->author = $request->author;
+        $book->quote = $request->excerpt;
+        $book->pages = $request->number_of_pages;
+        $book->category_id = $request->category;
+
+        $book->save();
+
+        return response([
+            'data'=> new BookResource($book)
+        ],Response::HTTP_CREATED);
     }
 
     /**
@@ -71,9 +91,21 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
+    // $request sadrzi nove(izmenjene) podatke, a $book sve(stare) podatke
     public function update(UpdateBookRequest $request, Book $book)
     {
-        //
+
+        $request['quote'] = $request->excerpt;
+        unset($request['excerpt']);
+
+        $request['pages'] = $request->number_of_pages;
+        unset($request['number_of_pages']);
+
+        $book->update($request->all());
+
+        return response([
+            'data'=> new BookResource($book)
+        ],Response::HTTP_CREATED);
     }
 
     /**
@@ -84,6 +116,7 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        //
+        $book->delete();
+        return response(null,Response::HTTP_NO_CONTENT);
     }
 }
