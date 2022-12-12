@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\User;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Http\Resources\Book\BookResource;
 use App\Http\Resources\Book\BookCollection;
 use Symfony\Component\HttpFoundation\Response;
+use App\Exceptions\BookDoesNotBelongToAdmin;
+use App\Exceptions\UserDoesNotHaveAdminStatus;
+use Auth;
 
 class BookController extends Controller
 {
@@ -26,7 +30,7 @@ class BookController extends Controller
      */
     public function index()
     {
-        return BookCollection::collection(Book::paginate(4));                   // sve knjige iz baze, ali po 4 se prikazuju na jednoj stanici
+        return BookCollection::collection(Book::paginate(4));            // sve knjige iz baze, ali po 4 se prikazuju na jednoj stanici
     }
 
     /**
@@ -47,12 +51,17 @@ class BookController extends Controller
      */
     public function store(StoreBookRequest $request)
     {
+
+        // samo admin moze da doda novu knjigu
+        $this->addBookAdminCheck();
+
         $book = new Book;
         $book->title = $request->title;
         $book->author = $request->author;
         $book->quote = $request->excerpt;
         $book->pages = $request->number_of_pages;
         $book->category_id = $request->category;
+        $book->admin_id = Auth::id();
 
         $book->save();
 
@@ -94,6 +103,7 @@ class BookController extends Controller
     // $request sadrzi nove(izmenjene) podatke, a $book sve(stare) podatke
     public function update(UpdateBookRequest $request, Book $book)
     {
+        $this->bookAdminCheck($book);
 
         $request['quote'] = $request->excerpt;
         unset($request['excerpt']);
@@ -116,7 +126,27 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
+
+        $this->bookAdminCheck($book);
+        
         $book->delete();
         return response(null,Response::HTTP_NO_CONTENT);
+    }
+
+    public function addBookAdminCheck(){
+        $admins = User::where('user_type','=',1)->get();
+        foreach($admins as $admin){
+            if(Auth::id() == $admin->id){
+                return true;
+            }
+        }
+        throw new UserDoesNotHaveAdminStatus;
+    }
+
+    public function bookAdminCheck($book)
+    {
+        if(Auth::id() !== $book->admin_id){
+            throw new BookDoesNotBelongToAdmin;
+        }
     }
 }

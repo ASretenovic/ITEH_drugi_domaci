@@ -48,4 +48,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
+
+    // jedan admin dodaje vise knjige
+    public function adminBooks(){
+        return $this->hasMany(Book::class);
+    }
 }

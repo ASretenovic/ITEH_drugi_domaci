@@ -14,7 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        // izmenjeno sa 'web' na 'api'
+        'guard' => 'api',
         'passwords' => 'users',
     ],
 

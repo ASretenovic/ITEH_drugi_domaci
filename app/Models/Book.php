@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Category;
 use App\Models\Review;
+use App\Models\User;
 
 class Book extends Model
 {
@@ -14,7 +15,6 @@ class Book extends Model
 
     protected $fillable =[
         'title','author','quote','pages'
-
     ];
 
     // jedna knjiga pripada jednoj kategoriji
@@ -25,5 +25,10 @@ class Book extends Model
     // za jednu knjigu postoji vise recenzija
     public function bookReviews(){
         return $this->hasMany(Review::class);
+    }
+
+    // knjigu dodaje jedan admin
+    public function bookAdmin(){
+        return $this->belongsTo(User::class);
     }
 }

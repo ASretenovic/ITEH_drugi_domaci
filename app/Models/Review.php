@@ -11,6 +11,10 @@ class Review extends Model
 {
     use HasFactory;
 
+    protected $fillable =[
+        'title','review_text','rating'
+    ];
+
     // jedna recenzija se odnosi na jednu knjigu
     public function book()
     {
