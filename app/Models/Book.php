@@ -14,7 +14,7 @@ class Book extends Model
 
 
     protected $fillable =[
-        'title','author','quote','pages'
+        'title','author','quote','pages','category_id'
     ];
 
     // jedna knjiga pripada jednoj kategoriji
